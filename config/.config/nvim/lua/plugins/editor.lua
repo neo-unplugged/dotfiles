@@ -10,30 +10,30 @@ return {
     build  = ":TSUpdate",
     event  = { "BufReadPre", "BufNewFile" },
     config = function()
-      -- nvim-treesitter v1+ API: no .configs module, call directly
-      require("nvim-treesitter").setup()
+    -- nvim-treesitter v1+ API: no .configs module, call directly
+    require("nvim-treesitter").setup()
 
-      -- Install parsers
-      require("nvim-treesitter.install").prefer_git = true
-      local parsers = {
-        "lua", "vim", "vimdoc", "query",
-        "javascript", "typescript", "tsx",
-        "python", "rust", "go",
-        "html", "css", "json", "yaml", "toml",
-        "markdown", "markdown_inline",
-        "bash", "dockerfile",
-      }
-      require("nvim-treesitter").install(parsers)
+    -- Install parsers
+    require("nvim-treesitter.install").prefer_git = true
+    local parsers = {
+      "lua", "vim", "vimdoc", "query",
+      "javascript", "typescript", "tsx",
+      "python", "rust", "go",
+      "html", "css", "json", "yaml", "toml",
+      "markdown", "markdown_inline",
+      "bash", "dockerfile",
+    }
+    require("nvim-treesitter").install(parsers)
 
-      -- Highlighting (enabled per-buffer via autocmd in v1+)
-      vim.api.nvim_create_autocmd("FileType", {
-        callback = function(args)
-          local ok = pcall(vim.treesitter.start, args.buf)
-          if not ok then
-            -- parser not available for this filetype, skip silently
-          end
+    -- Highlighting (enabled per-buffer via autocmd in v1+)
+    vim.api.nvim_create_autocmd("FileType", {
+      callback = function(args)
+      local ok = pcall(vim.treesitter.start, args.buf)
+      if not ok then
+        -- parser not available for this filetype, skip silently
+        end
         end,
-      })
+    })
     end,
   },
 

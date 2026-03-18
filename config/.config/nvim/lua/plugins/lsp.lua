@@ -27,14 +27,14 @@ return {
     dependencies = { "williamboman/mason.nvim" },
     opts = {
       ensure_installed = {
-        "lua_ls",       -- Lua
-        "ts_ls",        -- TypeScript / JavaScript
-        "pyright",      -- Python
-        "cssls",        -- CSS
-        "html",         -- HTML
-        "jsonls",       -- JSON
-        "eslint",       -- ESLint
-        "tailwindcss",  -- Tailwind CSS
+        "lua_ls",      -- Lua
+        "ts_ls",       -- TypeScript / JavaScript
+        "pyright",     -- Python
+        "cssls",       -- CSS
+        "html",        -- HTML
+        "jsonls",      -- JSON
+        "eslint",      -- ESLint
+        "tailwindcss", -- Tailwind CSS
         -- Add more here as needed:
         -- "gopls",     -- Go
         -- "clangd",    -- C/C++
@@ -52,7 +52,7 @@ return {
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
     },
-    config = function()
+    config       = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       -- ── Shared on_attach via autocmd ──────────────────
@@ -62,32 +62,33 @@ return {
           if not client then return end
           -- Inlay hints (VSCode-style)
           if client:supports_method("textDocument/inlayHint") then
-            vim.lsp.inlay_hint.enable(true, args.buf)
+            vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
           end
         end,
       })
 
       -- ── Rounded borders for hover/signature ───────────
       vim.lsp.handlers["textDocument/hover"] =
-        vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+          vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
       vim.lsp.handlers["textDocument/signatureHelp"] =
-        vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+          vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
       -- ── VSCode-style diagnostics ──────────────────────
       vim.diagnostic.config({
         virtual_text     = { prefix = "●", spacing = 4 },
-        signs            = true,
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = " ",
+            [vim.diagnostic.severity.WARN]  = " ",
+            [vim.diagnostic.severity.HINT]  = "󰌶",
+            [vim.diagnostic.severity.INFO]  = "󰋽",
+          },
+        },
         underline        = true,
         update_in_insert = false,
         severity_sort    = true,
         float            = { border = "rounded", source = true },
       })
-
-      local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-      for type, icon in pairs(signs) do
-        local hl = "DiagnosticSign" .. type
-        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-      end
 
       -- ── Server configs (new vim.lsp.config API) ───────
       vim.lsp.config("lua_ls", {
@@ -101,12 +102,12 @@ return {
         },
       })
 
-      vim.lsp.config("ts_ls",       { capabilities = capabilities })
-      vim.lsp.config("pyright",     { capabilities = capabilities })
-      vim.lsp.config("cssls",       { capabilities = capabilities })
-      vim.lsp.config("html",        { capabilities = capabilities })
-      vim.lsp.config("jsonls",      { capabilities = capabilities })
-      vim.lsp.config("eslint",      { capabilities = capabilities })
+      vim.lsp.config("ts_ls", { capabilities = capabilities })
+      vim.lsp.config("pyright", { capabilities = capabilities })
+      vim.lsp.config("cssls", { capabilities = capabilities })
+      vim.lsp.config("html", { capabilities = capabilities })
+      vim.lsp.config("jsonls", { capabilities = capabilities })
+      vim.lsp.config("eslint", { capabilities = capabilities })
       vim.lsp.config("tailwindcss", { capabilities = capabilities })
 
       -- ── Extra languages (uncomment to enable) ─────────
@@ -128,7 +129,7 @@ return {
     "nvimdev/lspsaga.nvim",
     event        = "LspAttach",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {
+    opts         = {
       ui = {
         border      = "rounded",
         code_action = "💡",
@@ -140,13 +141,13 @@ return {
       },
       symbol_in_winbar = { enable = true },
     },
-    keys = {
-      { "<C-.>",     "<cmd>Lspsaga code_action<CR>",     desc = "Code action"     },
-      { "K",         "<cmd>Lspsaga hover_doc<CR>",       desc = "Hover docs"      },
-      { "gf",        "<cmd>Lspsaga finder<CR>",          desc = "LSP finder"      },
+    keys         = {
+      { "<C-.>",     "<cmd>Lspsaga code_action<CR>",     desc = "Code action" },
+      { "K",         "<cmd>Lspsaga hover_doc<CR>",       desc = "Hover docs" },
+      { "gf",        "<cmd>Lspsaga finder<CR>",          desc = "LSP finder" },
       { "gp",        "<cmd>Lspsaga peek_definition<CR>", desc = "Peek definition" },
-      { "<F2>",      "<cmd>Lspsaga rename<CR>",          desc = "Rename symbol"   },
-      { "<leader>o", "<cmd>Lspsaga outline<CR>",         desc = "Symbol outline"  },
+      { "<F2>",      "<cmd>Lspsaga rename<CR>",          desc = "Rename symbol" },
+      { "<leader>o", "<cmd>Lspsaga outline<CR>",         desc = "Symbol outline" },
     },
   },
 
@@ -164,7 +165,7 @@ return {
       "rafamadriz/friendly-snippets",
       "onsails/lspkind.nvim",
     },
-    config = function()
+    config       = function()
       local cmp     = require("cmp")
       local luasnip = require("luasnip")
       local lspkind = require("lspkind")
@@ -184,32 +185,40 @@ return {
           ["<Esc>"]     = cmp.mapping.abort(),
           ["<CR>"]      = cmp.mapping.confirm({ select = false }),
           ["<Tab>"]     = cmp.mapping(function(fallback)
-            if cmp.visible() then cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then luasnip.expand_or_jump()
-            else fallback() end
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
           end, { "i", "s" }),
           ["<S-Tab>"]   = cmp.mapping(function(fallback)
-            if cmp.visible() then cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then luasnip.jump(-1)
-            else fallback() end
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
           end, { "i", "s" }),
-          ["<C-j>"] = cmp.mapping.select_next_item(),
-          ["<C-k>"] = cmp.mapping.select_prev_item(),
-          ["<C-d>"] = cmp.mapping.scroll_docs(4),
-          ["<C-u>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-j>"]     = cmp.mapping.select_next_item(),
+          ["<C-k>"]     = cmp.mapping.select_prev_item(),
+          ["<C-d>"]     = cmp.mapping.scroll_docs(4),
+          ["<C-u>"]     = cmp.mapping.scroll_docs(-4),
         }),
         sources = cmp.config.sources({
           { name = "nvim_lsp", priority = 1000 },
-          { name = "luasnip",  priority = 750  },
-          { name = "buffer",   priority = 500  },
-          { name = "path",     priority = 250  },
+          { name = "luasnip",  priority = 750 },
+          { name = "buffer",   priority = 500 },
+          { name = "path",     priority = 250 },
         }),
         formatting = {
           format = lspkind.cmp_format({
             mode          = "symbol_text",
             maxwidth      = 50,
             ellipsis_char = "...",
-            before = function(entry, vim_item)
+            before        = function(entry, vim_item)
               vim_item.menu = ({
                 nvim_lsp = "[LSP]",
                 luasnip  = "[Snip]",
