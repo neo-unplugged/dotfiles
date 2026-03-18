@@ -17,6 +17,20 @@ export NVM_DIR="$HOME/.nvm"
 . "$HOME/.cargo/env"
 
 # User defined aliases
+#
+# =========== Directory =============
 alias ls='eza --icons'
 alias lst='eza --icons --tree -L 1'
-#alias cat='bat'
+# =========== Navigation ============
+alias ..='cd ..'
+alias ~='cd'
+
+# =========== Git =============
+alias gi='git init'
+alias ga='git add'
+alias gs='git status'
+alias gp='git push'
+alias gl='git pull'
+alias gc='git commit'
+
+
