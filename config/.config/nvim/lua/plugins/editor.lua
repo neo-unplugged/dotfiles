@@ -6,59 +6,57 @@ return {
   -- ── TreeSitter: syntax highlighting ──────────────────────
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "main",   -- v1+ lives on main branch
+    branch = "main",
     build  = ":TSUpdate",
     event  = { "BufReadPre", "BufNewFile" },
     config = function()
-    -- nvim-treesitter v1+ API: no .configs module, call directly
-    require("nvim-treesitter").setup()
+      require("nvim-treesitter").setup()
+      require("nvim-treesitter.install").prefer_git = true
 
-    -- Install parsers
-    require("nvim-treesitter.install").prefer_git = true
-    local parsers = {
-      "lua", "vim", "vimdoc", "query",
-      "javascript", "typescript", "tsx",
-      "python", "rust", "go",
-      "html", "css", "json", "yaml", "toml",
-      "markdown", "markdown_inline",
-      "bash", "dockerfile",
-    }
-    require("nvim-treesitter").install(parsers)
+      local parsers = {
+        "lua", "vim", "vimdoc", "query",
+        "javascript", "typescript", "tsx",
+        "python", "rust", "go",
+        "html", "css", "json", "yaml", "toml",
+        "markdown", "markdown_inline",
+        "bash", "dockerfile",
+      }
+      require("nvim-treesitter").install(parsers)
 
-    -- Highlighting (enabled per-buffer via autocmd in v1+)
-    vim.api.nvim_create_autocmd("FileType", {
-      callback = function(args)
-      local ok = pcall(vim.treesitter.start, args.buf)
-      if not ok then
-        -- parser not available for this filetype, skip silently
-        end
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(args)
+          pcall(vim.treesitter.start, args.buf)
         end,
-    })
+      })
     end,
   },
 
-  -- ── Auto-pairs (VSCode auto-close brackets) ───────────────
+  -- ── Auto-pairs ────────────────────────────────────────────
   {
     "windwp/nvim-autopairs",
-    event = "InsertEnter",
+    event        = "InsertEnter",
+    dependencies = { "hrsh7th/nvim-cmp" },  -- ensure cmp loads first
     opts  = {
       fast_wrap = {
-        map          = "<M-e>",
-        chars        = { "{", "[", "(", '"', "'" },
-        pattern      = string.format([=[[%s%%s%s]]=], "%s", "%s"),
-        end_key      = "$",
-        keys         = "qwertyuiopzxcvbnmasdfghjkl",
-        check_comma  = true,
-        highlight    = "PmenuSel",
+        map            = "<M-e>",
+        chars          = { "{", "[", "(", '"', "'" },
+        pattern        = string.format([=[[%s%%s%s]]=], "%s", "%s"),
+        end_key        = "$",
+        keys           = "qwertyuiopzxcvbnmasdfghjkl",
+        check_comma    = true,
+        highlight      = "PmenuSel",
         highlight_grey = "LineNr",
       },
     },
     config = function(_, opts)
       local autopairs = require("nvim-autopairs")
       autopairs.setup(opts)
-      -- Connect with cmp
-      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-      require("cmp").event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      -- Hook into cmp confirm — guarded in case cmp isn't available
+      local ok, cmp = pcall(require, "cmp")
+      if ok then
+        local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+        cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+      end
     end,
   },
 
@@ -66,32 +64,30 @@ return {
   {
     "numToStr/Comment.nvim",
     event = "VeryLazy",
-    opts  = {
-      padding = true,
-      sticky  = true,
-    },
+    opts  = { padding = true, sticky = true },
     config = function(_, opts)
       require("Comment").setup(opts)
-      -- Map Ctrl+/ to toggle comment (VSCode style)
       local api = require("Comment.api")
-      vim.keymap.set("n", "<C-/>", api.toggle.linewise.current, { desc = "Toggle comment" })
+      vim.keymap.set("n", "<C-/>", api.toggle.linewise.current,
+        { desc = "Toggle comment" })
       vim.keymap.set("v", "<C-/>", function()
-        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<ESC>", true, false, true), "nx", false)
+        vim.api.nvim_feedkeys(
+          vim.api.nvim_replace_termcodes("<ESC>", true, false, true), "nx", false)
         api.toggle.linewise(vim.fn.visualmode())
       end, { desc = "Toggle comment (visual)" })
     end,
   },
 
-  -- ── vim-surround: wrap/unwrap text ───────────────────────
+  -- ── nvim-surround ─────────────────────────────────────────
   { "kylechui/nvim-surround", event = "VeryLazy", opts = {} },
 
-  -- ── Multi-cursor (Ctrl+D like VSCode) ────────────────────
+  -- ── Multi-cursor (Ctrl+D) ─────────────────────────────────
   {
     "mg979/vim-visual-multi",
     event = "VeryLazy",
     init  = function()
       vim.g.VM_maps = {
-        ["Find Under"]         = "<C-d>",   -- Ctrl+D like VSCode
+        ["Find Under"]         = "<C-d>",
         ["Find Subword Under"] = "<C-d>",
         ["Select All"]         = "<C-S-l>",
         ["Add Cursor Down"]    = "<C-S-Down>",
@@ -101,20 +97,20 @@ return {
     end,
   },
 
-  -- ── Toggleterm: integrated terminal (Ctrl+`) ─────────────
+  -- ── Toggleterm: integrated terminal ──────────────────────
   {
     "akinsho/toggleterm.nvim",
     keys = { "<C-`>" },
     opts = {
-      size          = function(term)
+      size = function(term)
         if term.direction == "horizontal" then return 15
         elseif term.direction == "vertical" then return vim.o.columns * 0.4
         end
       end,
-      open_mapping  = [[<C-`>]],
-      direction     = "horizontal",
+      open_mapping    = [[<C-`>]],
+      direction       = "horizontal",
       shade_terminals = true,
-      shading_factor = 2,
+      shading_factor  = 2,
       start_in_insert = true,
       persist_mode    = true,
       close_on_exit   = true,
@@ -123,26 +119,26 @@ return {
     },
   },
 
-  -- ── Trouble: VSCode Problems panel ───────────────────────
+  -- ── Trouble: diagnostics panel ───────────────────────────
   {
     "folke/trouble.nvim",
-    cmd  = { "Trouble", "TroubleToggle" },
+    cmd          = { "Trouble", "TroubleToggle" },
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = { use_diagnostic_signs = true },
+    opts         = { use_diagnostic_signs = true },
     keys = {
-      { "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>", desc = "Toggle diagnostics panel" },
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>",    desc = "Toggle diagnostics panel" },
       { "<leader>xd", "<cmd>Trouble lsp_definitions toggle<CR>", desc = "LSP definitions" },
     },
   },
 
-  -- ── Hop: VSCode Go-to line / fast navigation ─────────────
+  -- ── Hop: fast navigation ─────────────────────────────────
   {
     "smoka7/hop.nvim",
     event = "VeryLazy",
     opts  = { keys = "etovxqpdygfblzhckisuran" },
     keys  = {
-      { "<leader>hw", "<cmd>HopWord<CR>",        desc = "Hop to word" },
-      { "<leader>hl", "<cmd>HopLineStart<CR>",   desc = "Hop to line" },
+      { "<leader>hw", "<cmd>HopWord<CR>",      desc = "Hop to word" },
+      { "<leader>hl", "<cmd>HopLineStart<CR>", desc = "Hop to line" },
     },
   },
 
@@ -152,16 +148,13 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     config = function()
       require("colorizer").setup({ "*" }, {
-        RGB      = true,
-        RRGGBB   = true,
-        names    = true,
-        css      = true,
-        css_fn   = true,
+        RGB    = true, RRGGBB = true,
+        names  = true, css   = true, css_fn = true,
       })
     end,
   },
 
-  -- ── Todo-comments: highlight TODOs like VSCode ───────────
+  -- ── Todo-comments ─────────────────────────────────────────
   {
     "folke/todo-comments.nvim",
     event        = { "BufReadPre", "BufNewFile" },
@@ -174,8 +167,8 @@ return {
     "RRethy/vim-illuminate",
     event  = { "BufReadPre", "BufNewFile" },
     opts   = {
-      delay          = 200,
-      large_file_cutoff = 2000,
+      delay                = 200,
+      large_file_cutoff    = 2000,
       large_file_overrides = { providers = { "lsp" } },
     },
     config = function(_, opts)

@@ -16,6 +16,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 . "$HOME/.cargo/env"
 
-# User defined scripts
+# User defined aliases
 alias ls='eza --icons'
+alias lst='eza --icons --tree -L 1'
 #alias cat='bat'

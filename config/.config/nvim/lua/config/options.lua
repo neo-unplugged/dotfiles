@@ -4,6 +4,13 @@
 
 local opt = vim.opt
 
+-- ── Disable netrw (must be before any plugin loads it) ────
+vim.g.loaded_netrw       = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- ── Nerd Font ─────────────────────────────────────────────
+vim.g.have_nerd_font = true   -- tells plugins icons are available
+
 -- ── UI ────────────────────────────────────────────────────
 opt.number         = true          -- Line numbers
 opt.relativenumber = false         -- Absolute numbers (like VSCode)
@@ -49,7 +56,7 @@ opt.updatetime     = 200           -- Faster CursorHold events
 opt.timeoutlen     = 300           -- Faster key sequence timeout
 
 -- ── Clipboard ─────────────────────────────────────────────
-opt.clipboard      = "unnamedplus" -- Sync with system clipboard (Ctrl+C/V)
+opt.clipboard      = "unnamedplus" -- Sync with system clipboard
 
 -- ── Completion ────────────────────────────────────────────
 opt.completeopt    = { "menu", "menuone", "noselect" }
@@ -65,6 +72,3 @@ opt.mouse          = "a"           -- Enable mouse support
 opt.conceallevel   = 0
 opt.fileencoding   = "utf-8"
 opt.backspace      = { "indent", "eol", "start" }
-
--- ── Nerd Font ─────────────────────────────────────────────
-vim.g.have_nerd_font = true   -- tells plugins icons are available

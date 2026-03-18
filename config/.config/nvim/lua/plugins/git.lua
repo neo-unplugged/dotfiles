@@ -29,14 +29,14 @@ return {
       },
       current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d> - <summary>",
       on_attach = function(bufnr)
-        local gs = package.loaded.gitsigns
+        local gs  = package.loaded.gitsigns
         local map = function(mode, l, r, desc)
           vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
         end
-        -- Navigation
+        -- Hunk navigation
         map("n", "]c", gs.next_hunk,            "Next git hunk")
         map("n", "[c", gs.prev_hunk,            "Prev git hunk")
-        -- Actions
+        -- Hunk actions
         map("n", "<leader>hs", gs.stage_hunk,   "Stage hunk")
         map("n", "<leader>hr", gs.reset_hunk,   "Reset hunk")
         map("n", "<leader>hS", gs.stage_buffer, "Stage buffer")
@@ -56,13 +56,16 @@ return {
       "sindrets/diffview.nvim",
       "nvim-telescope/telescope.nvim",
     },
+    keys = {
+      { "<leader>gs", "<cmd>Neogit<CR>", desc = "Git status" },
+    },
     opts = {
-      kind               = "split",
-      integrations       = { diffview = true, telescope = true },
+      kind         = "split",
+      integrations = { diffview = true, telescope = true },
       signs = {
-        section  = { "", "" },
-        item     = { "", "" },
-        hunk     = { "", "" },
+        section = { "", "" },
+        item    = { "", "" },
+        hunk    = { "", "" },
       },
     },
   },
@@ -71,12 +74,15 @@ return {
   {
     "sindrets/diffview.nvim",
     cmd  = { "DiffviewOpen", "DiffviewFileHistory" },
+    keys = {
+      { "<leader>gd", "<cmd>DiffviewOpen<CR>", desc = "Git diff view" },
+    },
     opts = {
       enhanced_diff_hl = true,
       view = {
-        default         = { layout = "diff2_horizontal" },
-        merge_tool      = { layout = "diff3_horizontal" },
-        file_history    = { layout = "diff2_horizontal" },
+        default      = { layout = "diff2_horizontal" },
+        merge_tool   = { layout = "diff3_horizontal" },
+        file_history = { layout = "diff2_horizontal" },
       },
     },
   },

@@ -15,9 +15,9 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
   spec = {
-    { import = "plugins" },           -- loads all files in lua/plugins/
+    { import = "plugins" },     -- loads all files in lua/plugins/ recursively
   },
-  defaults = { lazy = true },         -- lazy-load everything by default
+  defaults = { lazy = true },   -- lazy-load everything by default
   install  = { colorscheme = { "tokyonight" } },
   ui = {
     border = "rounded",
@@ -25,7 +25,7 @@ require("lazy").setup({
       package = "📦", loaded = "✓", not_loaded = "○",
     },
   },
-  checker = { enabled = true, notify = false }, -- auto-check for updates
+  checker = { enabled = true, notify = false },
   performance = {
     rtp = {
       disabled_plugins = {

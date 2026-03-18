@@ -30,14 +30,14 @@ autocmd("BufReadPost", {
 -- ── Auto-resize splits on window resize ───────────────────
 augroup("ResizeSplits", { clear = true })
 autocmd("VimResized", {
-  group = "ResizeSplits",
+  group   = "ResizeSplits",
   command = "tabdo wincmd =",
 })
 
 -- ── Remove trailing whitespace on save ────────────────────
 augroup("TrimWhitespace", { clear = true })
 autocmd("BufWritePre", {
-  group = "TrimWhitespace",
+  group   = "TrimWhitespace",
   pattern = "*",
   command = [[%s/\s\+$//e]],
 })
@@ -55,5 +55,4 @@ autocmd("BufEnter", {
   end,
 })
 
--- ── Format on save handled by conform.nvim (formatting.lua) -
--- (removed from here to avoid double-formatting)
+-- ── Format on save handled by conform.nvim (plugins/formatting.lua)

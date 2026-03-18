@@ -1,5 +1,6 @@
 -- ============================================================
 --  plugins/explorer.lua — File explorer (VSCode sidebar feel)
+--  Note: netrw is disabled in config/options.lua
 -- ============================================================
 
 return {
@@ -7,11 +8,23 @@ return {
     "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     event = "VeryLazy",
+    keys = {
+      {
+        "<C-e>",
+        function()
+          local api  = require("nvim-tree.api")
+          local view = require("nvim-tree.view")
+          if view.is_visible() then
+            api.tree.close()
+          else
+            api.tree.open()
+            vim.cmd("wincmd p")   -- return focus to editor
+          end
+        end,
+        desc = "Toggle file explorer",
+      },
+    },
     config = function()
-      -- Must disable netrw BEFORE nvim-tree loads
-      vim.g.loaded_netrw       = 1
-      vim.g.loaded_netrwPlugin = 1
-
       require("nvim-tree").setup({
         hijack_netrw       = true,
         hijack_cursor      = true,
@@ -31,12 +44,12 @@ return {
               file   = { enable = true, color = true },
               folder = { enable = true, color = true },
             },
-            git_placement  = "after",
+            git_placement = "after",
             show = {
-              file        = true,
-              folder      = true,
+              file         = true,
+              folder       = true,
               folder_arrow = true,
-              git         = true,
+              git          = true,
             },
           },
         },
