@@ -1,46 +1,34 @@
 -- ============================================================
---  plugins/colorscheme.lua — VSCode-like Dark+ theme
+--  plugins/colorscheme.lua — TokyoNight (VSCode Dark+ vibes)
 -- ============================================================
 
 return {
   {
     "folke/tokyonight.nvim",
-    lazy    = false,    -- load immediately
-    priority = 1000,    -- load before other plugins
+    lazy    = false,
+    priority = 1000,
     opts = {
-      style        = "night",   -- closest to VSCode Dark+
-      transparent  = false,
+      style       = "night",   -- night | storm | day | moon
+      transparent = false,
       terminal_colors = true,
       styles = {
-        comments   = { italic = true },
-        keywords   = { bold   = true },
-        functions  = {},
-        variables  = {},
-        sidebars   = "dark",
-        floats     = "dark",
+        comments  = { italic = true },
+        keywords  = { italic = true },
+        functions = {},
+        variables = {},
+        sidebars  = "dark",
+        floats    = "dark",
       },
       on_highlights = function(hl, c)
-        -- Make the cursor line more like VSCode
-        hl.CursorLine = { bg = "#1f2335" }
-        -- VSCode-style selection color
-        hl.Visual     = { bg = "#264f78" }
+        -- Make the active line number pop like VSCode
+        hl.CursorLineNr = { fg = c.yellow, bold = true }
+        -- Slightly brighter indent lines
+        hl.IndentBlanklineChar = { fg = c.dark3 }
       end,
     },
     config = function(_, opts)
       require("tokyonight").setup(opts)
-      vim.cmd("colorscheme tokyonight-night")
+      vim.cmd("colorscheme tokyonight")
     end,
   },
-
-  -- Alternative: use the actual VSCode theme
-  -- Uncomment below and comment out tokyonight to use it
-  -- {
-  --   "Mofiqul/vscode.nvim",
-  --   lazy = false,
-  --   priority = 1000,
-  --   config = function()
-  --     require("vscode").setup({ style = "dark" })
-  --     vim.cmd("colorscheme vscode")
-  --   end,
-  -- },
 }

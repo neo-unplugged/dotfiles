@@ -3,7 +3,6 @@
 # install.sh — Fresh machine dotfiles installer
 # Usage: bash install.sh
 # =============================================================================
-
 set -e
 
 DOTFILES_REPO="https://github.com/neo-unplugged/dotfiles"
@@ -14,8 +13,9 @@ BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d_%H%M%S)"
 PACKAGES=(
   stow
   git
-  zsh
+  base-devel
   neovim
+  tree-sitter-cli
   curl
   wget
 )
@@ -50,8 +50,6 @@ fi
 
 # ── 3. Backup conflicts & stow ────────────────────────────────────────────────
 log "Stowing packages..."
-mkdir -p "$BACKUP_DIR"
-
 cd "$DOTFILES_DIR"
 
 for pkg in */; do
@@ -62,8 +60,12 @@ for pkg in */; do
 
   if [ -n "$conflicts" ]; then
     warn "Conflicts in '$pkg', backing up..."
+    # Only create backup dir when we actually need it
+    mkdir -p "$BACKUP_DIR"
+
     echo "$conflicts" | while read -r line; do
-      file=$(echo "$line" | awk '{print $NF}')
+      # Extract the conflicting path from stow's message reliably
+      file=$(echo "$line" | sed 's/.*existing target is neither a link nor a stow member: //')
       if [ -e "$HOME/$file" ] && [ ! -L "$HOME/$file" ]; then
         mkdir -p "$BACKUP_DIR/$(dirname "$file")"
         mv "$HOME/$file" "$BACKUP_DIR/$file"
@@ -72,7 +74,8 @@ for pkg in */; do
     done
   fi
 
-  stow --no-folding "$pkg" && ok "stow $pkg"
+  # Don't let a single package failure abort the whole script
+  stow --no-folding "$pkg" && ok "stow $pkg" || warn "stow $pkg failed, skipping"
 done
 
 # ── 4. Done ───────────────────────────────────────────────────────────────────
@@ -80,10 +83,8 @@ echo ""
 echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
 echo -e "${GREEN}${BOLD}  Dotfiles installed!${RESET}"
 echo -e "${GREEN}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-
 if [ -d "$BACKUP_DIR" ] && [ "$(ls -A "$BACKUP_DIR")" ]; then
   echo -e "  Backups saved to: ${YELLOW}$BACKUP_DIR${RESET}"
 fi
-
 echo -e "  Restart shell or run: ${CYAN}source ~/.zshrc${RESET}"
 echo ""

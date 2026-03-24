@@ -1,101 +1,129 @@
 -- ============================================================
---  plugins/ui.lua — UI enhancements (VSCode-like chrome)
+--  plugins/ui.lua — VSCode-like UI chrome
 -- ============================================================
 
 return {
-  -- ── Lualine: VSCode-style statusbar ─────────────────────
+
+  -- ── Statusline (lualine) ──────────────────────────────────
   {
     "nvim-lualine/lualine.nvim",
-    event        = "VeryLazy",
+    event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {
       options = {
-        theme                 = "tokyonight",
-        component_separators  = { left = "", right = "" },
-        section_separators    = { left = "", right = "" },
-        globalstatus          = true,
-        disabled_filetypes    = { statusline = { "NvimTree", "lazy" } },
+        theme                = "tokyonight",
+        globalstatus         = true,
+        component_separators = { left = "", right = "" },
+        section_separators   = { left = "", right = "" },
       },
       sections = {
-        lualine_a = { { "mode", icon = "" } },
+        lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
         lualine_b = { "branch", "diff", "diagnostics" },
-        lualine_c = { { "filename", path = 1 } },  -- relative path
-        lualine_x = {
-          { "encoding" },
-          { "fileformat" },
-          { "filetype", icon_only = false },
-        },
+        lualine_c = { { "filename", path = 1 } },
+        lualine_x = { "encoding", "fileformat", "filetype" },
         lualine_y = { "progress" },
-        lualine_z = { "location" },
+        lualine_z = { { "location", separator = { right = "" }, left_padding = 2 } },
       },
     },
   },
 
-  -- ── Bufferline: VSCode-style tabs ────────────────────────
+  -- ── Bufferline (VSCode tabs) ──────────────────────────────
   {
     "akinsho/bufferline.nvim",
     event        = "VeryLazy",
+    version      = "*",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      local bufferline = require("bufferline")
-      bufferline.setup({
+    opts = {
       options = {
-        mode                = "buffers",
-        style_preset        = bufferline.style_preset.default,
-        themable            = true,
-        numbers             = "none",
-        close_command       = "bdelete! %d",
-        diagnostics         = "nvim_lsp",
-        diagnostics_indicator = function(count, level)
-          local icon = level:match("error") and " " or " "
-          return " " .. icon .. count
-        end,
+        mode                    = "buffers",
+        diagnostics             = "nvim_lsp",
+        separator_style         = "slant",
+        show_buffer_close_icons = true,
+        show_close_icon         = false,
+        always_show_bufferline  = true,
         offsets = {
           {
-            filetype   = "NvimTree",
-            text       = " Explorer",
-            text_align = "left",
-            separator  = true,
+            filetype  = "NvimTree",
+            text      = "  Explorer",
+            highlight = "Directory",
+            separator = true,
           },
-        },
-        color_icons         = true,
-        show_buffer_icons   = true,
-        show_buffer_close_icons = true,
-        show_close_icon     = true,
-        show_tab_indicators = true,
-        separator_style     = "slant",
-        always_show_bufferline = true,
-      },
-      })
-    end,
-  },
-
-  -- ── Indent guides (VSCode-style) ─────────────────────────
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    main  = "ibl",
-    event = { "BufReadPre", "BufNewFile" },
-    opts  = {
-      indent = {
-        char      = "│",
-        tab_char  = "│",
-      },
-      scope = {
-        enabled   = true,
-        show_start = true,
-        show_end   = false,
-      },
-      exclude = {
-        filetypes = {
-          "help", "alpha", "dashboard", "NvimTree",
-          "Trouble", "lazy", "mason", "notify",
-          "toggleterm", "lazyterm",
         },
       },
     },
   },
 
-  -- ── Noice: VSCode-style command/notification UI ──────────
+  -- ── File Explorer (nvim-tree) ─────────────────────────────
+  {
+    "nvim-tree/nvim-tree.lua",
+    cmd          = { "NvimTreeToggle", "NvimTreeOpen", "NvimTreeFocus" },
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {
+      hijack_netrw        = true,
+      sync_root_with_cwd  = true,
+      respect_buf_cwd     = true,
+      update_focused_file = { enable = true },
+      view = { width = 35, side = "left" },
+      renderer = {
+        group_empty = true,
+        icons = {
+          glyphs = {
+            default = "",
+            symlink = "",
+            folder  = {
+              arrow_closed = "",
+              arrow_open   = "",
+              default      = "󰉋",
+              open         = "󰝰",
+              empty        = "󰉖",
+              empty_open   = "󰷏",
+              symlink      = "󰉒",
+              symlink_open = "󰉒",
+            },
+            git = {
+              unstaged  = "✗",
+              staged    = "✓",
+              unmerged  = "",
+              renamed   = "➜",
+              untracked = "★",
+              deleted   = "",
+              ignored   = "◌",
+            },
+          },
+        },
+      },
+      filters     = { dotfiles = false },
+      git         = { enable = true, ignore = false },
+      -- diagnostics intentionally disabled — sign-based renderer is broken
+      -- in current nvim-tree; use lsp inline diagnostics instead
+      diagnostics = { enable = false },
+    },
+  },
+
+  -- ── Indent guides ─────────────────────────────────────────
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    main  = "ibl",
+    opts  = {
+      indent = { char = "│" },
+      scope  = { enabled = true, show_start = false },
+    },
+  },
+
+  -- ── Breadcrumbs / winbar ──────────────────────────────────
+  {
+    "utilyre/barbecue.nvim",
+    event        = { "BufReadPost", "BufNewFile" },
+    version      = "*",
+    dependencies = {
+      "SmiteshP/nvim-navic",
+      "nvim-tree/nvim-web-devicons",
+    },
+    opts = { theme = "tokyonight" },
+  },
+
+  -- ── Notifications ─────────────────────────────────────────
   {
     "folke/noice.nvim",
     event        = "VeryLazy",
@@ -109,45 +137,10 @@ return {
         },
       },
       presets = {
-        bottom_search        = true,   -- classic bottom search bar
-        command_palette      = true,   -- position command palette like VSCode
+        bottom_search         = true,
+        command_palette       = true,
         long_message_to_split = true,
-        inc_rename           = false,
-        lsp_doc_border       = true,   -- bordered LSP docs
-      },
-    },
-  },
-
-  -- ── Nvim-notify: VSCode-style notifications ──────────────
-  {
-    "rcarriga/nvim-notify",
-    event = "VeryLazy",
-    opts = {
-      timeout     = 3000,
-      max_height  = function() return math.floor(vim.o.lines * 0.75) end,
-      max_width   = function() return math.floor(vim.o.columns * 0.75) end,
-      on_open     = function(win)
-        vim.api.nvim_win_set_config(win, { zindex = 100 })
-      end,
-      render      = "compact",
-      stages      = "fade",
-    },
-  },
-
-  -- ── Which-key: VSCode keybinding hints popup ─────────────
-  {
-    "folke/which-key.nvim",
-    event = "VeryLazy",
-    opts  = {
-      -- v3+ API (window → win, plugins removed)
-      win    = { border = "rounded" },
-      layout = { align = "center" },
-      spec   = {
-        { "<leader>g", group = "Git" },
-        { "<leader>f", group = "Find" },
-        { "<leader>l", group = "LSP" },
-        { "<leader>h", group = "Git hunks" },
-        { "<leader>x", group = "Diagnostics" },
+        inc_rename            = false,
       },
     },
   },
@@ -162,24 +155,52 @@ return {
       config = {
         header = {
           "",
-          "  ██╗  ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
-          "  ███╗ ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
-          "  ██╔██╗██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
-          "  ██║╚████║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
-          "  ██║ ╚███║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
-          "  ╚═╝  ╚══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
+          "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
+          "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
+          "  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
+          "  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
+          "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
+          "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
           "",
         },
         center = {
-          { action = "Telescope find_files",    desc = "  Find File",     key = "f" },
-          { action = "Telescope oldfiles",       desc = "  Recent Files",  key = "r" },
-          { action = "Telescope live_grep",      desc = "  Find Text",     key = "g" },
-          { action = function() require("nvim-tree.api").tree.toggle({ focus = false }) end, desc = "  File Explorer", key = "e" },
-          { action = "Lazy",                     desc = "  Plugins",       key = "p" },
-          { action = "qa",                       desc = "  Quit",          key = "q" },
+          { icon = "  ", key = "n", desc = "New File",        action = "enew" },
+          { icon = "  ", key = "p", desc = "Find File",       action = "Telescope find_files" },
+          { icon = "  ", key = "r", desc = "Recent Files",    action = "Telescope oldfiles" },
+          { icon = "  ", key = "g", desc = "Live Grep",       action = "Telescope live_grep" },
+          { icon = "  ", key = "s", desc = "Restore Session", action = "lua require('persistence').load()" },
+          { icon = "  ", key = "l", desc = "Lazy",            action = "Lazy" },
+          { icon = "  ", key = "q", desc = "Quit",            action = "qa" },
         },
-        footer = { "", "✨ Happy Coding!" },
+        footer = { "", "  Neovim — fast. modal. yours." },
       },
     },
   },
+
+  -- ── Which-key v3 ─────────────────────────────────────────
+  {
+    "folke/which-key.nvim",
+    event   = "VeryLazy",
+    version = "*",
+    opts    = {
+      plugins = { spelling = true },
+    },
+    config = function(_, opts)
+      local wk = require("which-key")
+      wk.setup(opts)
+      wk.add({
+        { "<leader>f", group = "file/find" },
+        { "<leader>g", group = "git" },
+        { "<leader>l", group = "lsp" },
+        { "<leader>s", group = "search" },
+        { "<leader>x", group = "diagnostics" },
+        { "<leader>q", group = "session" },
+        { "<leader>b", group = "buffer" },
+        { "g",         group = "goto" },
+        { "]",         group = "next" },
+        { "[",         group = "prev" },
+      })
+    end,
+  },
+
 }
