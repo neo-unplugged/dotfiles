@@ -9,3 +9,5 @@
 	name = Atik
 [core]
 	editor = nvim
+[init]
+	defaultBranch = main
