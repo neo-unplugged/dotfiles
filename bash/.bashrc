@@ -34,3 +34,19 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 . "$HOME/.cargo/env"
 . "$HOME/.local/bin/env"
+
+# System
+alias update='sudo pacman -Sy'
+alias upgrade='sudo pacman -Syu'
+alias clean='sudo pacman -Rns $(pacman -Qdtq)'
+alias shutdown='systemctl poweroff'
+alias logout='pkill -KILL -u $USER'
+
+# pnpm
+export PNPM_HOME="/home/neo/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+export PATH=$PATH:~/go/bin
