@@ -1,0 +1,80 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+format = """
+┌──($username@$hostname)-($directory$git_branch$git_status)
+└─$python$nodejs$rust$golang$cmd_duration$character"""
+palette = "tokyo_night"
+
+[palettes.tokyo_night]
+blue = "#7aa2f7"
+cyan = "#7dcfff"
+green = "#9ece6a"
+magenta = "#bb9af7"
+red = "#f7768e"
+yellow = "#e0af68"
+fg = "#c0caf5"
+muted = "#565f89"
+
+[directory]
+style = "bold white"
+truncation_length = 1
+truncate_to_repo = true
+truncation_symbol = ""
+format = "\\[[📁$path\\]]($style)"
+
+[username]
+show_always = true
+style_user = "bold green"
+format = "[\\($user]($style)"
+
+[hostname]
+ssh_only = false
+style = "bold green"
+format = "[$hostname\\)]($style)"
+
+[git_branch]
+symbol = "🌿"
+style = "magenta"
+format = " [$symbol $branch]($style)"
+
+[git_status]
+style = "yellow"
+format = '([$all_status$ahead_behind]($style))'
+conflicted = "!"
+ahead = "⇡$count"
+behind = "⇣$count"
+modified = "~$count"
+untracked = "?$count"
+staged = "+$count"
+
+[cmd_duration]
+min_time = 2_000
+style = "muted"
+format = "[$duration]($style) "
+
+[python]
+symbol = "🐍"
+style = "cyan"
+format = '[$symbol $version]($style) '
+
+[nodejs]
+symbol = "⬢"
+style = "green"
+format = '[$symbol $version]($style) '
+
+[rust]
+symbol = "🦀"
+style = "red"
+format = '[$symbol $version]($style) '
+
+[golang]
+symbol = "🐹"
+style = "green"
+format = '[$symbol $version]($style) '
+detect_files = ['go.mod', 'go.sum']
+
+[character]
+success_symbol = "[❯](bold blue)"
+error_symbol = "[❯](bold red)"
+
+[line_break]
+disabled = true

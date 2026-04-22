@@ -64,7 +64,8 @@ zstyle ':completion:*' rehash true
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # Prompt
-PROMPT=$'%F{white}┌──(%B%F{blue}%n  %m%b%F{white})-[%B%F{reset}%~%b%F{white}]\n└─%B%F{blue}$%b%F{reset} '
+# PROMPT=$'%F{magenta}▶%f %F{cyan}%~%f %F{magenta}❯%f '
+PROMPT=$'%F{cyan}╭─%f %F{magenta}⚡%f %F{white}%~%f %(?.%F{green}✓.%F{red}✗)%f%F{cyan}\n╰─%f %F{magenta}❯%f '
 
 # Env
 export NVM_DIR="$HOME/.nvm"
@@ -93,3 +94,5 @@ alias upgrade='sudo pacman -Syu'
 alias clean='sudo pacman -Rns $(pacman -Qdtq)'
 alias shutdown='systemctl poweroff'
 alias logout='pkill -KILL -u $USER'
+
+eval "$(starship init zsh)"
