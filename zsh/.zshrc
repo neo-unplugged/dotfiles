@@ -5,7 +5,6 @@
 plug "zsh-users/zsh-autosuggestions"
 plug "zsh-users/zsh-syntax-highlighting"
 plug "zap-zsh/supercharge"
-#plug "zap-zsh/zap-prompt"
 
 # Kali-style syntax highlight colors
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
@@ -64,8 +63,11 @@ zstyle ':completion:*' rehash true
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
 # Prompt
-# PROMPT=$'%F{magenta}▶%f %F{cyan}%~%f %F{magenta}❯%f '
-PROMPT=$'%F{cyan}╭─%f %F{magenta}⚡%f %F{white}%~%f %(?.%F{green}✓.%F{red}✗)%f%F{cyan}\n╰─%f %F{magenta}❯%f '
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+else
+    PROMPT=$'%F{cyan}╭─%f %F{magenta}⚡%f %F{white}%~%f %(?.%F{green}✓.%F{red}✗)%f%F{cyan}\n╰─%f %F{magenta}❯%f '
+fi
 
 # Env
 export NVM_DIR="$HOME/.nvm"
@@ -94,5 +96,3 @@ alias upgrade='sudo pacman -Syu'
 alias clean='sudo pacman -Rns $(pacman -Qdtq)'
 alias shutdown='systemctl poweroff'
 alias logout='pkill -KILL -u $USER'
-
-eval "$(starship init zsh)"
