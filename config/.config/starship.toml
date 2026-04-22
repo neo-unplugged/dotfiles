@@ -1,7 +1,8 @@
 "$schema" = 'https://starship.rs/config-schema.json'
+add_newline = false
 format = """
 ┌──($username@$hostname)-($directory$git_branch$git_status)
-└─$python$nodejs$rust$golang$cmd_duration$character"""
+└─$cmake$c$cpp$python$nodejs$rust$golang$cmd_duration$character"""
 palette = "tokyo_night"
 
 [palettes.tokyo_night]
@@ -51,6 +52,27 @@ min_time = 2_000
 style = "muted"
 format = "[$duration]($style) "
 
+[cmake]
+symbol = "🛠️ "
+style = "blue"
+format = '[$symbol $version]($style) '
+detect_files = ['CMakeLists.txt']
+detect_folders = []
+
+[c]
+symbol = "C"
+style = "blue"
+format = '[$symbol $version]($style) '
+detect_files = ['*.c']
+detect_extensions = ['c']
+
+[cpp]
+symbol = "C++"
+style = "blue"
+format = '[$symbol $version]($style) '
+detect_files = ['*.cpp', '*.cc', '*.cxx', '*.h', '*.hpp']
+detect_extensions = ['cpp', 'cc', 'cxx', 'h', 'hpp']
+
 [python]
 symbol = "🐍"
 style = "cyan"
@@ -77,4 +99,4 @@ success_symbol = "[❯](bold blue)"
 error_symbol = "[❯](bold red)"
 
 [line_break]
-disabled = true
+disabled = false
