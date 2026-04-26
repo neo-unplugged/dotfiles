@@ -123,7 +123,7 @@ return {
           glyphs = {
             default  = "",
             symlink  = "",
-            folder   = { arrow_open = "", arrow_closed = "", default = "", open = "", empty = "", empty_open = "" },
+                -- folder line REMOVED - let NvimTree use defaults
             git      = { unstaged = "✗", staged = "✓", unmerged = "", renamed = "➜", untracked = "★", deleted = "", ignored = "◌" },
           },
         },
