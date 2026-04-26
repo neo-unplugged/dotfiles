@@ -8,21 +8,20 @@ return {
     event        = "InsertEnter",
     dependencies = {
       -- Sources
-      "hrsh7th/cmp-nvim-lsp",          -- LSP
-      "hrsh7th/cmp-buffer",             -- buffer words
-      "hrsh7th/cmp-path",               -- file paths
-      "hrsh7th/cmp-cmdline",            -- cmdline completions
-      "hrsh7th/cmp-nvim-lsp-signature-help", -- signature while typing
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",
+      "hrsh7th/cmp-nvim-lsp-signature-help",
       -- Snippets
       "L3MON4D3/LuaSnip",
       "saadparwaiz1/cmp_luasnip",
-      "rafamadriz/friendly-snippets",   -- snippet collection
+      "rafamadriz/friendly-snippets",
     },
     config = function()
       local cmp     = require("cmp")
       local luasnip = require("luasnip")
 
-      -- Load snippet collection
       require("luasnip.loaders.from_vscode").lazy_load()
 
       local kind_icons = {
@@ -48,7 +47,7 @@ return {
         },
 
         mapping = cmp.mapping.preset.insert({
-          ["<C-Space>"]  = cmp.mapping.complete(),            -- trigger completion
+          ["<C-Space>"]  = cmp.mapping.complete(),
           ["<CR>"]       = cmp.mapping.confirm({ select = true }),
           ["<Tab>"]      = cmp.mapping(function(fallback)
             if cmp.visible() then cmp.select_next_item()
@@ -63,7 +62,6 @@ return {
           ["<C-b>"]      = cmp.mapping.scroll_docs(-4),
           ["<C-f>"]      = cmp.mapping.scroll_docs(4),
           ["<C-e>"]      = cmp.mapping.abort(),
-          -- Arrow keys
           ["<Down>"]     = cmp.mapping.select_next_item(),
           ["<Up>"]       = cmp.mapping.select_prev_item(),
         }),
@@ -78,7 +76,6 @@ return {
               buffer    = "[Buf]",
               path      = "[Path]",
             })[entry.source.name] or ""
-            -- Truncate long completions
             if #item.abbr > 40 then item.abbr = item.abbr:sub(1, 40) .. "…" end
             return item
           end,
@@ -93,10 +90,9 @@ return {
           { name = "buffer", keyword_length = 3 },
         }),
 
-        experimental = { ghost_text = true },    -- inline suggestion like Copilot
+        experimental = { ghost_text = true },
       })
 
-      -- Cmdline completion
       cmp.setup.cmdline({ "/", "?" }, {
         mapping = cmp.mapping.preset.cmdline(),
         sources = { { name = "buffer" } },
