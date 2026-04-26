@@ -6,14 +6,14 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build  = ":TSUpdate",
-    event  = { "BufReadPost", "BufNewFile" },
+    -- CHANGED: VeryLazy instead of BufReadPost (non-critical for editing)
+    event  = "VeryLazy",
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
       "nvim-treesitter/nvim-treesitter-context",
       "JoosepAlviste/nvim-ts-context-commentstring",
       "windwp/nvim-ts-autotag",
     },
-    -- v1.0+: pass config directly as opts, no setup() call needed
     opts = {
       ensure_installed = {
         "go", "gomod", "gosum", "gowork",
@@ -59,15 +59,9 @@ return {
         },
       },
     },
-    -- Only extra setup needed is for the companion plugins
     config = function(_, opts)
-      -- v1.0 entry point
       require("nvim-treesitter").setup(opts)
-
-      -- Sticky context header
       require("treesitter-context").setup({ max_lines = 3 })
-
-      -- Context-aware comments (no autocmd needed in newer versions)
       require("ts_context_commentstring").setup({ enable_autocmd = false })
     end,
   },

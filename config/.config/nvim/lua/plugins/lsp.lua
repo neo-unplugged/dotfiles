@@ -22,17 +22,15 @@ return {
     event        = { "BufReadPre", "BufNewFile" },
     dependencies = { "williamboman/mason.nvim" },
     opts = {
-      -- Servers that should NOT be auto-started even if installed
       automatic_enable = {
         exclude = { "ruff", "rust_analyzer" },
       },
       ensure_installed = {
         "gopls",
-        -- clangd excluded: using system clangd v22 to avoid Mason conflict
         "rust_analyzer",
         "lua_ls",
         "pyright",
-        "ts_ls",          -- replaces deprecated tsserver
+        "ts_ls",
         "html",
         "cssls",
         "jsonls",
@@ -52,116 +50,125 @@ return {
       "hrsh7th/cmp-nvim-lsp",
     },
     config = function()
-      local caps = require("cmp_nvim_lsp").default_capabilities()
+      -- ═══════════════════════════════════════════════════════════════════════════════
+      -- CRITICAL: Moving expensive setup to a deferred autocmd to avoid blocking startup
+      -- ═══════════════════════════════════════════════════════════════════════════════
 
-      -- Rounded borders for hover & signature
-      vim.lsp.handlers["textDocument/hover"] =
-        vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-      vim.lsp.handlers["textDocument/signatureHelp"] =
-        vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+      local function setup_lsp_ui_and_handlers()
+        local caps = require("cmp_nvim_lsp").default_capabilities()
 
-      -- Diagnostics (0.11 API — no sign_define)
-      vim.diagnostic.config({
-        signs = {
-          text = {
-            [vim.diagnostic.severity.ERROR] = " ",
-            [vim.diagnostic.severity.WARN]  = " ",
-            [vim.diagnostic.severity.HINT]  = "󰌵 ",
-            [vim.diagnostic.severity.INFO]  = " ",
-          },
-        },
-        virtual_text     = { prefix = "●" },
-        float            = { border = "rounded", source = true },
-        update_in_insert = false,
-        severity_sort    = true,
-      })
+        -- Rounded borders for hover & signature
+        vim.lsp.handlers["textDocument/hover"] =
+          vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+        vim.lsp.handlers["textDocument/signatureHelp"] =
+          vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
-      -- Common on_attach keymaps via LspAttach autocmd (0.11 style)
-      vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),
-        callback = function(ev)
-          local buf = ev.buf
-          local map = function(m, l, r, desc)
-            vim.keymap.set(m, l, r, { buffer = buf, silent = true, desc = desc })
-          end
-          map("n", "gd",         vim.lsp.buf.definition,              "Go to definition")
-          map("n", "gD",         vim.lsp.buf.declaration,             "Go to declaration")
-          map("n", "gi",         vim.lsp.buf.implementation,          "Go to implementation")
-          map("n", "gt",         vim.lsp.buf.type_definition,         "Go to type definition")
-          map("n", "gr",         "<cmd>Telescope lsp_references<CR>", "References")
-          map("n", "K",          vim.lsp.buf.hover,                   "Hover docs")
-          map("n", "<C-k>",      vim.lsp.buf.signature_help,          "Signature help")
-          map("n", "<leader>rn", vim.lsp.buf.rename,                  "Rename symbol")
-          map("n", "<F2>",       vim.lsp.buf.rename,                  "Rename symbol")
-          map("n", "<leader>ca", vim.lsp.buf.code_action,             "Code action")
-          map("n", "<C-.>",      vim.lsp.buf.code_action,             "Code action")
-          map("n", "<S-A-f>",    function() vim.lsp.buf.format({ async = true }) end, "Format")
-          map("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, "Prev diagnostic")
-          map("n", "]d", function() vim.diagnostic.jump({ count =  1 }) end, "Next diagnostic")
-        end,
-      })
-
-      -- ── Server configs via vim.lsp.config (0.11 native) ──
-
-      vim.lsp.config("gopls", {
-        capabilities = caps,
-        settings = {
-          gopls = {
-            gofumpt         = true,
-            staticcheck     = true,
-            usePlaceholders = true,
-            analyses        = { unusedparams = true, shadow = true },
-            codelenses      = { generate = true, gc_details = true, test = true, tidy = true },
-            hints = {
-              assignVariableTypes    = true,
-              compositeLiteralFields = true,
-              constantValues         = true,
-              functionTypeParameters = true,
-              parameterNames         = true,
-              rangeVariableTypes     = true,
+        -- Diagnostics config
+        vim.diagnostic.config({
+          signs = {
+            text = {
+              [vim.diagnostic.severity.ERROR] = " ",
+              [vim.diagnostic.severity.WARN]  = " ",
+              [vim.diagnostic.severity.HINT]  = "󰌵 ",
+              [vim.diagnostic.severity.INFO]  = " ",
             },
           },
-        },
-      })
+          virtual_text     = { prefix = "●" },
+          float            = { border = "rounded", source = true },
+          update_in_insert = false,
+          severity_sort    = true,
+        })
 
-      vim.lsp.config("clangd", {
-        capabilities = caps,
-        cmd = {
-          "/usr/bin/clangd",
-          "--completion-style=detailed",
-          "--function-arg-placeholders",
-          "--header-insertion=never",  -- safer default without compile_commands.json
-          "--offset-encoding=utf-16",  -- avoids encoding warning with nvim
-        },
-      })
+        -- Common on_attach keymaps via LspAttach autocmd
+        vim.api.nvim_create_autocmd("LspAttach", {
+          group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),
+          callback = function(ev)
+            local buf = ev.buf
+            local map = function(m, l, r, desc)
+              vim.keymap.set(m, l, r, { buffer = buf, silent = true, desc = desc })
+            end
+            map("n", "gd",         vim.lsp.buf.definition,              "Go to definition")
+            map("n", "gD",         vim.lsp.buf.declaration,             "Go to declaration")
+            map("n", "gi",         vim.lsp.buf.implementation,          "Go to implementation")
+            map("n", "gt",         vim.lsp.buf.type_definition,         "Go to type definition")
+            map("n", "gr",         "<cmd>Telescope lsp_references<CR>", "References")
+            map("n", "K",          vim.lsp.buf.hover,                   "Hover docs")
+            map("n", "<C-k>",      vim.lsp.buf.signature_help,          "Signature help")
+            map("n", "<leader>rn", vim.lsp.buf.rename,                  "Rename symbol")
+            map("n", "<F2>",       vim.lsp.buf.rename,                  "Rename symbol")
+            map("n", "<leader>ca", vim.lsp.buf.code_action,             "Code action")
+            map("n", "<C-.>",      vim.lsp.buf.code_action,             "Code action")
+            map("n", "<S-A-f>",    function() vim.lsp.buf.format({ async = true }) end, "Format")
+            map("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, "Prev diagnostic")
+            map("n", "]d", function() vim.diagnostic.jump({ count =  1 }) end, "Next diagnostic")
+          end,
+        })
 
-      vim.lsp.config("lua_ls", {
-        capabilities = caps,
-        settings = {
-          Lua = {
-            runtime     = { version = "LuaJIT" },
-            diagnostics = { globals = { "vim" } },
-            workspace   = {
-              library         = vim.api.nvim_get_runtime_file("", true),
-              checkThirdParty = false,
+        -- ── Server configs via vim.lsp.config (0.11 native) ──
+        local caps_with_inlay = require("cmp_nvim_lsp").default_capabilities()
+
+        vim.lsp.config("gopls", {
+          capabilities = caps_with_inlay,
+          settings = {
+            gopls = {
+              gofumpt         = true,
+              staticcheck     = true,
+              usePlaceholders = true,
+              analyses        = { unusedparams = true, shadow = true },
+              codelenses      = { generate = true, gc_details = true, test = true, tidy = true },
+              hints = {
+                assignVariableTypes    = true,
+                compositeLiteralFields = true,
+                constantValues         = true,
+                functionTypeParameters = true,
+                parameterNames         = true,
+                rangeVariableTypes     = true,
+              },
             },
-            telemetry   = { enable = false },
           },
-        },
-      })
+        })
 
-      vim.lsp.config("pyright",  { capabilities = caps })
-      vim.lsp.config("ts_ls",    { capabilities = caps })
-      for _, srv in ipairs({ "html", "cssls", "jsonls", "bashls", "taplo" }) do
-        vim.lsp.config(srv, { capabilities = caps })
+        vim.lsp.config("clangd", {
+          capabilities = caps,
+          cmd = {
+            "/usr/bin/clangd",
+            "--completion-style=detailed",
+            "--function-arg-placeholders",
+            "--header-insertion=never",
+            "--offset-encoding=utf-16",
+          },
+        })
+
+        vim.lsp.config("lua_ls", {
+          capabilities = caps,
+          settings = {
+            Lua = {
+              runtime     = { version = "LuaJIT" },
+              diagnostics = { globals = { "vim" } },
+              workspace   = {
+                library         = vim.api.nvim_get_runtime_file("", true),
+                checkThirdParty = false,
+              },
+              telemetry   = { enable = false },
+            },
+          },
+        })
+
+        vim.lsp.config("pyright",  { capabilities = caps })
+        vim.lsp.config("ts_ls",    { capabilities = caps })
+        for _, srv in ipairs({ "html", "cssls", "jsonls", "bashls", "taplo" }) do
+          vim.lsp.config(srv, { capabilities = caps })
+        end
+
+        -- Enable servers
+        vim.lsp.enable({
+          "gopls", "clangd", "lua_ls", "pyright",
+          "ts_ls", "html", "cssls", "jsonls", "bashls", "taplo",
+        })
       end
 
-      -- Enable only the servers we want
-      -- ruff excluded (not installed); rust_analyzer excluded (rustaceanvim handles it)
-      vim.lsp.enable({
-        "gopls", "clangd", "lua_ls", "pyright",
-        "ts_ls", "html", "cssls", "jsonls", "bashls", "taplo",
-      })
+      -- Defer setup to VeryLazy so it doesn't block startup
+      vim.schedule_wrap(setup_lsp_ui_and_handlers)()
     end,
   },
 
@@ -218,8 +225,6 @@ return {
           nls.builtins.formatting.clang_format,
           nls.builtins.formatting.stylua,
           nls.builtins.formatting.black,
-          -- flake8/ruff diagnostics: use ruff as LSP instead (see mason ensure_installed)
-          -- nls.builtins.diagnostics.flake8,  -- removed: needs manual setup
           nls.builtins.formatting.shfmt,
           nls.builtins.formatting.prettier.with({ extra_filetypes = { "toml" } }),
         },
@@ -228,7 +233,6 @@ return {
   },
 
   -- ── Mason tool installer (formatters/linters) ─
-  -- VeryLazy to avoid racing with mason-lspconfig on startup
   {
     "jay-babu/mason-null-ls.nvim",
     event        = "VeryLazy",

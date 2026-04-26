@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────
---  plugins/ui.lua  –  Visual / UI plugins (VSCode-style)
+--  plugins/ui.lua  –  Visual / UI plugins
 -- ─────────────────────────────────────────────
 
 return {
@@ -82,26 +82,9 @@ return {
         show_buffer_close_icons = true,
         show_close_icon         = false,
         separator_style         = "slant",
-        always_show_bufferline  = true,  -- CHANGED: Always show tabs (like VSCode)
+        always_show_bufferline  = false,
       },
     },
-    -- ── VSCode-style buffer navigation ────────────
-    config = function(_, opts)
-      require("bufferline").setup(opts)
-      
-      local map = vim.keymap.set
-      -- Switch buffers with Ctrl+Tab / Ctrl+Shift+Tab (VSCode style)
-      map("n", "<C-Tab>",       "<cmd>BufferLineCycleNext<CR>",     { noremap = true, silent = true })
-      map("n", "<C-S-Tab>",     "<cmd>BufferLineCyclePrev<CR>",     { noremap = true, silent = true })
-      
-      -- Or use Alt+1, Alt+2, etc to jump to specific tabs
-      for i = 1, 9 do
-        map("n", "<A-" .. i .. ">", "<cmd>BufferLineGoToBuffer " .. i .. "<CR>", { noremap = true, silent = true })
-      end
-      
-      -- Close buffer with Ctrl+W
-      map("n", "<C-w>",         "<cmd>Bdelete<CR>",                { noremap = true, silent = true })
-    end,
   },
 
   -- ── File Explorer (sidebar) ───────────────────
@@ -109,9 +92,7 @@ return {
     "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     cmd          = { "NvimTreeToggle", "NvimTreeFocus" },
-    keys         = { 
-      { "<C-b>", "<cmd>NvimTreeToggle<CR>", desc = "Toggle Sidebar" }
-    },
+    keys         = { { "<C-b>", "<cmd>NvimTreeToggle<CR>" } },
     opts = {
       disable_netrw  = true,
       hijack_netrw   = true,
@@ -205,6 +186,7 @@ return {
   -- ── Dashboard ─────────────────────────────────
   {
     "goolord/alpha-nvim",
+    -- CHANGED: Only load when opening nvim without args (VimEnter)
     event = "VimEnter",
     config = function()
       local alpha   = require("alpha")
