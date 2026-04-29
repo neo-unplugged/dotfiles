@@ -46,80 +46,12 @@ return {
       },
       sections = {
         lualine_a = { "mode" },
-        -- Middle-left section (file info)
-        lualine_b = {
-          { "branch", icon = "", color = { fg = "#a6da95" } },
-          {
-            "diff",
-            symbols = { added = " ", modified = " ", removed = " " },
-            colored = true,
-          },
-          {
-            "diagnostics",
-            symbols = { error = " ", warn = " ", info = " ", hint = "󰌵 " },
-            diagnostics_color = {
-              error = { fg = "#f38181" },
-              warn  = { fg = "#eed49f" },
-              info  = { fg = "#8087a2" },
-              hint  = { fg = "#91d7e3" },
-            },
-          },
-        },
-        -- Center section (filename)
-        lualine_c = {
-          { "filename", path = 1, file_status = true, symbols = { modified = " ●", readonly = " 🔒", unnamed = "[No Name]" } },
-        },
-        -- Middle-right section (LSP servers)
-        lualine_x = {
-          {
-            function()
-            local buf_clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() })
-            if #buf_clients == 0 then
-              return "󰚌 No LSP"
-              end
-              local client_names = {}
-              for _, client in ipairs(buf_clients) do
-                table.insert(client_names, client.name)
-                end
-                return "󰒡 " .. table.concat(client_names, ", ")
-                end,
-                color = { fg = "#c6a0f6" },
-                cond = function()
-                return vim.fn.mode() ~= "c"
-                end,
-          },
-          {
-            "encoding",
-            fmt = string.upper,
-            color = { fg = "#8087a2" },
-            cond = function()
-            return vim.fn.strlen(vim.o.fileencoding) > 0
-            end,
-          },
-          {
-            "fileformat",
-            fmt = string.upper,
-            symbols = { unix = "LF", dos = "CRLF", mac = "CR" },
-            color = { fg = "#8087a2" },
-          },
-        },
+        lualine_b = { { "branch", icon = "" }, "diff", "diagnostics" },
+        lualine_c = { { "filename", path = 1 } },
+        lualine_x = { "encoding", "fileformat", "filetype" },
         lualine_y = { "progress" },
         lualine_z = { "location" },
       },
-
-      -- Inactive window statusline
-      inactive_sections = {
-        lualine_a = {},
-        lualine_b = {},
-        lualine_c = { "filename" },
-        lualine_x = { "location" },
-        lualine_y = {},
-        lualine_z = {},
-      },
-
-      -- Tabline (shows open buffers like VSCode)
-      tabline = {},
-      extensions = { "nvim-tree", "trouble", "fzf", "quickfix" },
     },
   },
 
@@ -237,6 +169,7 @@ return {
   -- ── Which-key (keybinding hints) ──────────────
   {
     "folke/which-key.nvim",
+    lazy = true,  -- Don't load at startup
     event = "VeryLazy",
     opts  = {
       preset = "modern",

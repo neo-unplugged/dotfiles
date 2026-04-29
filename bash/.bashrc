@@ -27,6 +27,7 @@ alias gs='git status'
 alias gp='git push'
 alias gl='git pull'
 alias gc='git commit'
+alias gca='git commit --amend'
 
 # Env
 export NVM_DIR="$HOME/.nvm"

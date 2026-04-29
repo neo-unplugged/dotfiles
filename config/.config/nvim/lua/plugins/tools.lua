@@ -76,16 +76,21 @@ return {
         dap_debug       = true,
         luasnip         = true,
       })
-      -- Extra keymaps for Go
-      local map = function(l, r, d)
-        vim.keymap.set("n", l, r, { ft = "go", silent = true, desc = d })
-      end
-      map("<leader>gt",  "<cmd>GoTest<CR>",        "Go Test")
-      map("<leader>gT",  "<cmd>GoTestFunc<CR>",    "Go Test Function")
-      map("<leader>gf",  "<cmd>GoFmt<CR>",         "Go Format")
-      map("<leader>gi",  "<cmd>GoImport<CR>",      "Go Import")
-      map("<leader>gI",  "<cmd>GoIfErr<CR>",       "Go Add If Err")
-      map("<leader>ga",  "<cmd>GoAlt<CR>",         "Go Alternate (test)")
+      -- Extra keymaps for Go (only in go buffers)
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "go",
+        callback = function()
+          local map = function(l, r, d)
+            vim.keymap.set("n", l, r, { buffer = true, silent = true, desc = d })
+          end
+          map("<leader>gt",  "<cmd>GoTest<CR>",        "Go Test")
+          map("<leader>gT",  "<cmd>GoTestFunc<CR>",    "Go Test Function")
+          map("<leader>gf",  "<cmd>GoFmt<CR>",         "Go Format")
+          map("<leader>gi",  "<cmd>GoImport<CR>",      "Go Import")
+          map("<leader>gI",  "<cmd>GoIfErr<CR>",       "Go Add If Err")
+          map("<leader>ga",  "<cmd>GoAlt<CR>",         "Go Alternate (test)")
+        end,
+      })
     end,
   },
 
