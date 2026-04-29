@@ -29,6 +29,9 @@ require("lazy").setup({
 	checker = { enabled = true, notify = false },
 	ui = { border = "rounded" },
 	performance = {
+		cache = {
+			enabled = true,
+		},
 		rtp = {
 			disabled_plugins = {
 				"gzip",
@@ -40,6 +43,11 @@ require("lazy").setup({
 				"tutor",
 				"zipPlugin",
 			},
+		},
+		-- Increase timeout from default (usually 30000ms) to 60-90 seconds
+		-- Increase git operations timeout
+		git = {
+			timeout = 180, -- 3 minutes instead of default
 		},
 	},
 })

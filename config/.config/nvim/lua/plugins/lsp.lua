@@ -57,11 +57,17 @@ return {
       local function setup_lsp_ui_and_handlers()
         local caps = require("cmp_nvim_lsp").default_capabilities()
 
-        -- Rounded borders for hover & signature
-        vim.lsp.handlers["textDocument/hover"] =
-          vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-        vim.lsp.handlers["textDocument/signatureHelp"] =
-          vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+        -- Rounded borders for hover & signature (Nvim 0.12+ compatible)
+        vim.lsp.handlers["textDocument/hover"] = function(_, result, ctx, config)
+          config = config or {}
+          config.border = "rounded"
+          return vim.lsp.handlers.hover(_, result, ctx, config)
+        end
+        vim.lsp.handlers["textDocument/signatureHelp"] = function(_, result, ctx, config)
+          config = config or {}
+          config.border = "rounded"
+          return vim.lsp.handlers.signature_help(_, result, ctx, config)
+        end
 
         -- Diagnostics config
         vim.diagnostic.config({
