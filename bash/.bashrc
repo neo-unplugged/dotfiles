@@ -51,3 +51,7 @@ case ":$PATH:" in
 esac
 # pnpm end
 export PATH=$PATH:~/go/bin
+
+# Android
+export ANDROID_HOME="$HOME/.local/share/android"
+export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"

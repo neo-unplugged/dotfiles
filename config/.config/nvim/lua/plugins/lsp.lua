@@ -6,12 +6,12 @@ return {
   -- ── Mason (LSP installer UI) ──────────────────
   {
     "williamboman/mason.nvim",
-    cmd   = "Mason",
+    cmd = "Mason",
     build = ":MasonUpdate",
-    opts  = {
+    opts = {
       ui = {
         border = "rounded",
-        icons  = { package_installed = "✓", package_pending = "➜", package_uninstalled = "✗" },
+        icons = { package_installed = "✓", package_pending = "➜", package_uninstalled = "✗" },
       },
     },
   },
@@ -19,7 +19,7 @@ return {
   -- ── Mason ↔ lspconfig bridge ──────────────────
   {
     "williamboman/mason-lspconfig.nvim",
-    event        = { "BufReadPre", "BufNewFile" },
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = { "williamboman/mason.nvim" },
     opts = {
       automatic_enable = {
@@ -36,6 +36,7 @@ return {
         "jsonls",
         "bashls",
         "taplo",
+        "kotlin_language_server",
       },
       automatic_installation = true,
     },
@@ -44,7 +45,7 @@ return {
   -- ── Native LSP setup (Neovim 0.11+) ──────────
   {
     "neovim/nvim-lspconfig",
-    event        = { "BufReadPre", "BufNewFile" },
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       "williamboman/mason-lspconfig.nvim",
       "hrsh7th/cmp-nvim-lsp",
@@ -74,15 +75,15 @@ return {
           signs = {
             text = {
               [vim.diagnostic.severity.ERROR] = " ",
-              [vim.diagnostic.severity.WARN]  = " ",
-              [vim.diagnostic.severity.HINT]  = "󰌵 ",
-              [vim.diagnostic.severity.INFO]  = " ",
+              [vim.diagnostic.severity.WARN] = " ",
+              [vim.diagnostic.severity.HINT] = "󰌵 ",
+              [vim.diagnostic.severity.INFO] = " ",
             },
           },
-          virtual_text     = { prefix = "●" },
-          float            = { border = "rounded", source = true },
+          virtual_text = { prefix = "●" },
+          float = { border = "rounded", source = true },
           update_in_insert = false,
-          severity_sort    = true,
+          severity_sort = true,
         })
 
         -- Common on_attach keymaps via LspAttach autocmd
@@ -93,20 +94,26 @@ return {
             local map = function(m, l, r, desc)
               vim.keymap.set(m, l, r, { buffer = buf, silent = true, desc = desc })
             end
-            map("n", "gd",         vim.lsp.buf.definition,              "Go to definition")
-            map("n", "gD",         vim.lsp.buf.declaration,             "Go to declaration")
-            map("n", "gi",         vim.lsp.buf.implementation,          "Go to implementation")
-            map("n", "gt",         vim.lsp.buf.type_definition,         "Go to type definition")
-            map("n", "gr",         "<cmd>Telescope lsp_references<CR>", "References")
-            map("n", "K",          vim.lsp.buf.hover,                   "Hover docs")
-            map("n", "<C-k>",      vim.lsp.buf.signature_help,          "Signature help")
-            map("n", "<leader>rn", vim.lsp.buf.rename,                  "Rename symbol")
-            map("n", "<F2>",       vim.lsp.buf.rename,                  "Rename symbol")
-            map("n", "<leader>ca", vim.lsp.buf.code_action,             "Code action")
-            map("n", "<C-.>",      vim.lsp.buf.code_action,             "Code action")
-            map("n", "<S-A-f>",    function() vim.lsp.buf.format({ async = true }) end, "Format")
-            map("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, "Prev diagnostic")
-            map("n", "]d", function() vim.diagnostic.jump({ count =  1 }) end, "Next diagnostic")
+            map("n", "gd", vim.lsp.buf.definition, "Go to definition")
+            map("n", "gD", vim.lsp.buf.declaration, "Go to declaration")
+            map("n", "gi", vim.lsp.buf.implementation, "Go to implementation")
+            map("n", "gt", vim.lsp.buf.type_definition, "Go to type definition")
+            map("n", "gr", "<cmd>Telescope lsp_references<CR>", "References")
+            map("n", "K", vim.lsp.buf.hover, "Hover docs")
+            map("n", "<C-k>", vim.lsp.buf.signature_help, "Signature help")
+            map("n", "<leader>rn", vim.lsp.buf.rename, "Rename symbol")
+            map("n", "<F2>", vim.lsp.buf.rename, "Rename symbol")
+            map("n", "<leader>ca", vim.lsp.buf.code_action, "Code action")
+            map("n", "<C-.>", vim.lsp.buf.code_action, "Code action")
+            map("n", "<S-A-f>", function()
+              vim.lsp.buf.format({ async = true })
+            end, "Format")
+            map("n", "[d", function()
+              vim.diagnostic.jump({ count = -1 })
+            end, "Prev diagnostic")
+            map("n", "]d", function()
+              vim.diagnostic.jump({ count = 1 })
+            end, "Next diagnostic")
           end,
         })
 
@@ -117,18 +124,18 @@ return {
           capabilities = caps_with_inlay,
           settings = {
             gopls = {
-              gofumpt         = true,
-              staticcheck     = true,
+              gofumpt = true,
+              staticcheck = true,
               usePlaceholders = true,
-              analyses        = { unusedparams = true, shadow = true },
-              codelenses      = { generate = true, gc_details = true, test = true, tidy = true },
+              analyses = { unusedparams = true, shadow = true },
+              codelenses = { generate = true, gc_details = true, test = true, tidy = true },
               hints = {
-                assignVariableTypes    = true,
+                assignVariableTypes = true,
                 compositeLiteralFields = true,
-                constantValues         = true,
+                constantValues = true,
                 functionTypeParameters = true,
-                parameterNames         = true,
-                rangeVariableTypes     = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
               },
             },
           },
@@ -149,27 +156,54 @@ return {
           capabilities = caps,
           settings = {
             Lua = {
-              runtime     = { version = "LuaJIT" },
+              runtime = { version = "LuaJIT" },
               diagnostics = { globals = { "vim" } },
-              workspace   = {
-                library         = vim.api.nvim_get_runtime_file("", true),
+              workspace = {
+                library = vim.api.nvim_get_runtime_file("", true),
                 checkThirdParty = false,
               },
-              telemetry   = { enable = false },
+              telemetry = { enable = false },
             },
           },
         })
 
-        vim.lsp.config("pyright",  { capabilities = caps })
-        vim.lsp.config("ts_ls",    { capabilities = caps })
+        vim.lsp.config("pyright", { capabilities = caps })
+        vim.lsp.config("ts_ls", { capabilities = caps })
+
+        -- kotlin_language_server
+        vim.lsp.config("kotlin_language_server", {
+          capabilities = caps,
+          root_dir = require("lspconfig.util").root_pattern(
+            "settings.gradle.kts",
+            "settings.gradle",
+            "gradlew"
+          ),
+          settings = {
+            kotlin = {
+              compiler = { jvm = { target = "17" } },
+              completion = { snippets = { enabled = true } },
+              inlayHints = { typeHints = true, parameterHints = true },
+            },
+          },
+        })
+
         for _, srv in ipairs({ "html", "cssls", "jsonls", "bashls", "taplo" }) do
           vim.lsp.config(srv, { capabilities = caps })
         end
 
         -- Enable servers
         vim.lsp.enable({
-          "gopls", "clangd", "lua_ls", "pyright",
-          "ts_ls", "html", "cssls", "jsonls", "bashls", "taplo",
+          "gopls",
+          "clangd",
+          "lua_ls",
+          "pyright",
+          "ts_ls",
+          "html",
+          "cssls",
+          "jsonls",
+          "bashls",
+          "taplo",
+          "kotlin_language_server",
         })
       end
 
@@ -182,35 +216,35 @@ return {
   {
     "mrcjkb/rustaceanvim",
     version = "^4",
-    ft      = { "rust" },
-    config  = function()
+    ft = { "rust" },
+    config = function()
       local caps = require("cmp_nvim_lsp").default_capabilities()
       vim.g.rustaceanvim = {
         server = {
           capabilities = caps,
           default_settings = {
             ["rust-analyzer"] = {
-              cargo       = { allFeatures = true },
+              cargo = { allFeatures = true },
               checkOnSave = { command = "clippy" },
-              inlayHints  = {
+              inlayHints = {
                 bindingModeHints = { enable = true },
-                chainingHints    = { enable = true },
-                parameterHints   = { enable = true },
-                typeHints        = { enable = true },
+                chainingHints = { enable = true },
+                parameterHints = { enable = true },
+                typeHints = { enable = true },
               },
             },
           },
         },
       }
       vim.api.nvim_create_autocmd("FileType", {
-        pattern  = "rust",
+        pattern = "rust",
         callback = function()
           local map = function(l, r, d)
             vim.keymap.set("n", l, r, { buffer = true, silent = true, desc = d })
           end
           map("<leader>re", "<cmd>RustLsp expandMacro<CR>", "Expand macro")
-          map("<leader>rr", "<cmd>RustLsp runnables<CR>",   "Runnables")
-          map("<leader>rt", "<cmd>RustLsp testables<CR>",   "Testables")
+          map("<leader>rr", "<cmd>RustLsp runnables<CR>", "Runnables")
+          map("<leader>rt", "<cmd>RustLsp testables<CR>", "Testables")
           map("<leader>rd", "<cmd>RustLsp debuggables<CR>", "Debuggables")
         end,
       })
@@ -220,7 +254,7 @@ return {
   -- ── none-ls (formatters / linters) ───────────
   {
     "nvimtools/none-ls.nvim",
-    event        = { "BufReadPre", "BufNewFile" },
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = { "nvim-lua/plenary.nvim", "williamboman/mason.nvim" },
     config = function()
       local nls = require("null-ls")
@@ -233,6 +267,8 @@ return {
           nls.builtins.formatting.black,
           nls.builtins.formatting.shfmt,
           nls.builtins.formatting.prettier.with({ extra_filetypes = { "toml" } }),
+          nls.builtins.formatting.ktlint,
+          nls.builtins.diagnostics.ktlint,
         },
       })
     end,
@@ -241,17 +277,21 @@ return {
   -- ── Mason tool installer (formatters/linters) ─
   {
     "jay-babu/mason-null-ls.nvim",
-    event        = "VeryLazy",
+    event = "VeryLazy",
     dependencies = { "williamboman/mason.nvim", "nvimtools/none-ls.nvim" },
     config = function()
       require("mason-null-ls").setup({
         ensure_installed = {
-          "gofumpt", "goimports",
+          "gofumpt",
+          "goimports",
           "clang-format",
           "stylua",
           "black",
+          "flake8",
           "prettier",
           "shfmt",
+          "kotlin-debug-adapter",
+          "ktlint",
         },
         automatic_installation = false,
       })
@@ -262,6 +302,6 @@ return {
   {
     "j-hui/fidget.nvim",
     event = "LspAttach",
-    opts  = { notification = { window = { winblend = 0 } } },
+    opts = { notification = { window = { winblend = 0 } } },
   },
 }
