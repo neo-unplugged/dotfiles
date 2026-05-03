@@ -32,13 +32,13 @@ require("lazy").setup({
 	{ import = "plugins.langs.c" },
 	{ import = "plugins.langs.python" },
 	-- { import = "plugins.langs.web" },
-	{ import = "plugins.langs.lua_lang" },
+	-- { import = "plugins.langs.lua_lang" },
 	{ import = "plugins.langs.kotlin" }, -- standalone Kotlin (LSP, ktlint, DAP, neotest)
 	-- { import = "plugins.langs.android" }, -- Android extras: Gradle, ADB (needs kotlin above)
 	-- { import = "plugins.langs.zig" },  -- uncomment to add Zig
 }, {
 	defaults = { lazy = true },
-	install = { colorscheme = { "catppuccin" } },
+	install = { colorscheme = { "catppuccin" }, concurrency = 1 },
 	checker = { enabled = true, notify = false },
 	ui = { border = "rounded" },
 
