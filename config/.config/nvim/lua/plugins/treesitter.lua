@@ -25,6 +25,7 @@ return {
         "html", "css", "json", "yaml", "toml",
         "bash", "markdown", "markdown_inline",
         "gitignore", "gitcommit",
+        "regex", "bash"
       },
 
       highlight = { enable = true, additional_vim_regex_highlighting = false },

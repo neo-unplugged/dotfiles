@@ -121,17 +121,15 @@ return {
 		},
 	},
 
-	-- ── Hop (quick navigation) ────────────────────
+	-- ── Flash (quick navigation) ────────────────────
 	{
-		"phaazon/hop.nvim",
-		branch = "v2",
+		"folke/flash.nvim",
 		event = "BufReadPost",
-		config = function()
-			local hop = require("hop")
-			hop.setup()
-			vim.keymap.set("n", "s", "<cmd>HopChar2<CR>")
-			vim.keymap.set("n", "S", "<cmd>HopWord<CR>")
-		end,
+		opts = {},
+		keys = {
+			{ "s", function() require("flash").jump() end,       desc = "Flash jump" },
+			{ "S", function() require("flash").treesitter() end, desc = "Flash treesitter" },
+		},
 	},
 
 	-- ── Buffer delete (keeps window layout) ───────
