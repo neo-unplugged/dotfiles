@@ -31,11 +31,12 @@ require("lazy").setup({
 	{ import = "plugins.langs.rust" },
 	{ import = "plugins.langs.c" },
 	{ import = "plugins.langs.python" },
-	-- { import = "plugins.langs.web" },
+	{ import = "plugins.langs.web" },
 	-- { import = "plugins.langs.lua_lang" },
 	{ import = "plugins.langs.kotlin" }, -- standalone Kotlin (LSP, ktlint, DAP, neotest)
 	-- { import = "plugins.langs.android" }, -- Android extras: Gradle, ADB (needs kotlin above)
 	-- { import = "plugins.langs.zig" },  -- uncomment to add Zig
+	{ import = "plugins.langs.latex" }, -- Latex support
 }, {
 	defaults = { lazy = true },
 	install = { colorscheme = { "catppuccin" }, concurrency = 1 },

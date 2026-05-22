@@ -108,7 +108,7 @@ return {
   {
     "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    cmd          = { "NvimTreeToggle", "NvimTreeFocus" },
+    event        = "VeryLazy",
     keys         = { 
       { "<C-b>", "<cmd>NvimTreeToggle<CR>", desc = "Toggle Sidebar" }
     },
@@ -117,6 +117,7 @@ return {
       hijack_netrw   = true,
       view           = { width = 32, side = "left" },
       renderer = {
+        root_folder_label = ":t",
         group_empty    = true,
         highlight_git  = true,
         icons = {
@@ -132,6 +133,23 @@ return {
       git            = { enable = true, ignore = false },
       actions        = { open_file = { quit_on_open = false, window_picker = { enable = true } } },
       update_focused_file = { enable = true },
+      on_attach = function(bufnr)
+        local api = require("nvim-tree.api")
+        local opt = { buffer = bufnr, noremap = true, silent = true, nowait = true }
+
+        api.config.mappings.default_on_attach(bufnr)
+
+        local function smart_cr()
+          local node = api.tree.get_node_under_cursor()
+          if not node then return end
+          -- root node: its absolute_path equals the tree root path — do nothing
+          if node.absolute_path == require("nvim-tree.core").get_cwd() then return end
+          api.node.open.edit()
+        end
+
+        vim.keymap.set("n", "<CR>",          smart_cr, opt)
+        vim.keymap.set("n", "<2-LeftMouse>", smart_cr, opt)
+      end,
     },
   },
 
@@ -201,7 +219,7 @@ return {
   },
 
   -- ── Smooth scrolling ─────────────────────────
-  { "karb94/neoscroll.nvim", event = "BufReadPost", opts = { mappings = { "<C-u>","<C-d>","<C-b>","<C-f>" } } },
+  { "karb94/neoscroll.nvim", event = "BufReadPost", opts = { mappings = { "<C-u>","<C-d>" } } },
 
   -- ── Dashboard ─────────────────────────────────
   {

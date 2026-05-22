@@ -59,8 +59,8 @@ return {
             elseif luasnip.jumpable(-1) then luasnip.jump(-1)
             else fallback() end
           end, { "i", "s" }),
-          ["<C-b>"]      = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"]      = cmp.mapping.scroll_docs(4),
+          ["<C-u>"]      = cmp.mapping.scroll_docs(-4),
+          ["<C-d>"]      = cmp.mapping.scroll_docs(4),
           ["<C-e>"]      = cmp.mapping.abort(),
           ["<Down>"]     = cmp.mapping.select_next_item(),
           ["<Up>"]       = cmp.mapping.select_prev_item(),

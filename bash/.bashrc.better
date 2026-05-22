@@ -5,12 +5,25 @@
 # Non-interactive guard
 [[ $- != *i* ]] && return
 
-# ── Prompt ────────────────────────────────────────────────────────────────────
-PS1='\[\e[0;32m\]┌──(\u@\h)\[\e[0m\]-[\[\e[0;34m\]\w\[\e[0m\]]\n\[\e[0;32m\]└─\[\e[0m\]\$ '
+# ── Prompt (Kali-style + exit code + git branch) ──────────────────────────────
+if command -v starship &>/dev/null; then
+    eval "$(starship init bash)"
+else
+    __prompt_git() {
+        local branch
+        branch=$(git symbolic-ref --short HEAD 2>/dev/null) || return
+        printf ' on \e[0;35m \e[0m%s\e[0m' "$branch"
+    }
 
-# ── Completion ────────────────────────────────────────────────────────────────
-[ -r /usr/share/bash-completion/bash_completion ] && \
-    source /usr/share/bash-completion/bash_completion
+    __prompt_cmd() {
+        local exit=$?
+        local ok='\[\e[0;32m\]' red='\[\e[0;31m\]' cyan='\[\e[0;36m\]' \
+              blue='\[\e[0;34m\]' rst='\[\e[0m\]'
+        local arrow; [[ $exit -eq 0 ]] && arrow="${ok}❯" || arrow="${red}❯"
+        PS1="${cyan}╭─${rst} ${blue}(${rst}\u${cyan}@${rst}\h${blue})${rst} ${cyan}-${rst} ${blue}[${rst}\w${blue}]${rst}\$(__prompt_git)\n${cyan}╰─${rst}${arrow}${rst} "
+    }
+    PROMPT_COMMAND=__prompt_cmd
+fi
 
 # ── History search ─────────────────────────────────────────────────────────────
 bind '"\e[A": history-search-backward'
@@ -44,10 +57,17 @@ alias logout='pkill -KILL -u $USER'
 [ -f "$HOME/.cargo/env" ]     && source "$HOME/.cargo/env"
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 
-# nvm
+# nvm (lazy-loaded)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ]          && source "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+nvm() {
+    unset -f nvm node npm npx
+    [ -s "$NVM_DIR/nvm.sh" ]          && source "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+    nvm "$@"
+}
+node() { nvm; node "$@"; }
+npm()  { nvm; npm  "$@"; }
+npx()  { nvm; npx  "$@"; }
 
 # pnpm
 export PNPM_HOME="/home/neo/.local/share/pnpm"

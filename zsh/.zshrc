@@ -1,13 +1,14 @@
-# Zap
-[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ] && source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
+# ── Zap ──────────────────────────────────────────────────────────────────────
+[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ] && \
+    source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
 
-# Plugins
+# ── Plugins ───────────────────────────────────────────────────────────────────
 plug "zsh-users/zsh-autosuggestions"
 plug "zsh-users/zsh-syntax-highlighting"
 plug "zap-zsh/supercharge"
 
-# Kali-style syntax highlight colors
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+# ── Syntax highlight (Kali-style) ─────────────────────────────────────────────
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
 ZSH_HIGHLIGHT_STYLES[unknown-token]=underline
 ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
 ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
@@ -39,44 +40,57 @@ ZSH_HIGHLIGHT_STYLES[bracket-level-4]=fg=yellow,bold
 ZSH_HIGHLIGHT_STYLES[bracket-level-5]=fg=cyan,bold
 ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]=standout
 
-# Kali-style autosuggestion color
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#999'
 
-# Kali-style zsh options
-setopt autocd
-setopt interactivecomments
-setopt magicequalsubst
-setopt nonomatch
-setopt notify
-setopt numericglobsort
-setopt hist_expire_dups_first
-setopt hist_ignore_dups
-setopt hist_ignore_space
-setopt hist_verify
+# ── Options ───────────────────────────────────────────────────────────────────
+setopt autocd interactivecomments magicequalsubst nonomatch notify \
+       numericglobsort hist_expire_dups_first hist_ignore_dups \
+       hist_ignore_space hist_verify
 
-# Completion
+# ── Completion (cached) ───────────────────────────────────────────────────────
 autoload -Uz compinit
-compinit
+_zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+# Only rebuild dump once per day
+if [[ -f "$_zcompdump" && $(date +%j) == $(date -r "$_zcompdump" +%j 2>/dev/null) ]]; then
+    compinit -C -d "$_zcompdump"
+else
+    compinit -d "$_zcompdump"
+fi
+unset _zcompdump
+
 zstyle ':completion:*:*:*:*:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*' rehash true
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 
-# Prompt
-if command -v starship >/dev/null 2>&1; then
+# ── Prompt ────────────────────────────────────────────────────────────────────
+if command -v starship &>/dev/null; then
     eval "$(starship init zsh)"
 else
-    PROMPT=$'%F{cyan}╭─%f %F{magenta}⚡%f %F{white}%~%f %(?.%F{green}✓.%F{red}✗)%f%F{cyan}\n╰─%f %F{magenta}❯%f '
+    autoload -Uz add-zsh-hook vcs_info
+
+    zstyle ':vcs_info:git:*' formats ' on %F{magenta} %b%f'
+    zstyle ':vcs_info:git:*' actionformats ' on %F{magenta} %b%f %F{red}(%a)%f'
+    zstyle ':vcs_info:*' enable git
+
+    _prompt_precmd() { vcs_info }
+    add-zsh-hook precmd _prompt_precmd
+
+    setopt prompt_subst
+    PROMPT=$'%F{cyan}╭─%f %F{blue}(%f%F{white}%n%F{cyan}@%f%F{white}%m%F{blue})%f %F{cyan}-%f %F{blue}[%f%F{white}%~%F{blue}]%f${vcs_info_msg_0_}\n%F{cyan}╰─%f%(?.%F{green}.%F{red})❯%f '
 fi
 
-# Env
+# ── Env ───────────────────────────────────────────────────────────────────────
 export NVM_DIR="$HOME/.nvm"
+
+# ── NVM ───────────────────────────────────────────────────────────────────────
 [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
-. "$HOME/.cargo/env"
-. "$HOME/.local/bin/env"
 
-# Aliases
+[ -f "$HOME/.cargo/env" ]      && source "$HOME/.cargo/env"
+[ -f "$HOME/.local/bin/env" ]  && source "$HOME/.local/bin/env"
+
+# ── Aliases ───────────────────────────────────────────────────────────────────
 alias ls='eza --icons'
 alias lst='eza --icons --tree -L 1'
 alias ..='cd ..'
@@ -91,7 +105,7 @@ alias gl='git pull'
 alias gc='git commit'
 alias gca='git commit --amend'
 
-# System
+# System (Arch)
 alias update='sudo pacman -Sy'
 alias upgrade='sudo pacman -Syu'
 alias clean='sudo pacman -Rns $(pacman -Qdtq)'

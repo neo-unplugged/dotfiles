@@ -8,10 +8,6 @@
 # ── Prompt ────────────────────────────────────────────────────────────────────
 PS1='\[\e[0;32m\]┌──(\u@\h)\[\e[0m\]-[\[\e[0;34m\]\w\[\e[0m\]]\n\[\e[0;32m\]└─\[\e[0m\]\$ '
 
-# ── Completion ────────────────────────────────────────────────────────────────
-[ -r /usr/share/bash-completion/bash_completion ] && \
-    source /usr/share/bash-completion/bash_completion
-
 # ── History search ─────────────────────────────────────────────────────────────
 bind '"\e[A": history-search-backward'
 bind '"\e[B": history-search-forward'
@@ -44,10 +40,17 @@ alias logout='pkill -KILL -u $USER'
 [ -f "$HOME/.cargo/env" ]     && source "$HOME/.cargo/env"
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 
-# nvm
+# nvm (lazy-loaded)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ]          && source "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+nvm() {
+    unset -f nvm node npm npx
+    [ -s "$NVM_DIR/nvm.sh" ]          && source "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && source "$NVM_DIR/bash_completion"
+    nvm "$@"
+}
+node() { nvm; node "$@"; }
+npm()  { nvm; npm  "$@"; }
+npx()  { nvm; npx  "$@"; }
 
 # pnpm
 export PNPM_HOME="/home/neo/.local/share/pnpm"

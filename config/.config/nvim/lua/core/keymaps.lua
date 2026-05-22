@@ -25,7 +25,6 @@ map("n", "<C-y>", "<C-r>",                           opts)               -- Ctrl
 --    terminal→ exit terminal mode (C-\ C-n), then run
 map("n", "<C-b>", "<cmd>NvimTreeToggle<CR>",            opts)            -- normal mode
 map("i", "<C-b>", "<Esc><cmd>NvimTreeToggle<CR>",       opts)            -- insert mode
-map("v", "<C-b>", "<cmd>NvimTreeToggle<CR>",            opts)            -- visual mode
 map("t", "<C-b>", "<C-\\><C-n><cmd>NvimTreeToggle<CR>", opts)            -- terminal mode
 
 map("n", "<leader>e", "<cmd>NvimTreeFocus<CR>",      opts)               -- focus sidebar (move cursor into it)
