@@ -77,7 +77,7 @@ detect_extensions = ['cpp', 'cc', 'cxx', 'h', 'hpp']
 [python]
 symbol = "🐍"
 style = "cyan"
-format = '[$symbol $version]($style) '
+format = '[$symbol $version]($style)[( \($virtualenv\))](bold yellow) '
 
 [nodejs]
 symbol = "⬢"

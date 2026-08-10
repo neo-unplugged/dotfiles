@@ -6,7 +6,16 @@
 [[ $- != *i* ]] && return
 
 # ── Prompt ────────────────────────────────────────────────────────────────────
-PS1='\[\e[0;32m\]┌──(\u@\h)\[\e[0m\]-[\[\e[0;34m\]\w\[\e[0m\]]\n\[\e[0;32m\]└─\[\e[0m\]\$ '
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+venv_info() {
+    if [ -n "$VIRTUAL_ENV" ]; then
+        echo "($(basename "$VIRTUAL_ENV"))"
+    fi
+}
+
+#PS1='\[\e[0;32m\]┌──(\u@\h)\[\e[0m\]-[\[\e[0;34m\]\W\[\e[0m\]]\n\[\e[0;32m\]└─$(venv_info)\[\e[0m\]\$ '
+PS1='\[\e[0;32m\]┌──(\u@\h)\[\e[0m\]-[\[\e[0;34m\]\W\[\e[0m\]]\n\[\e[0;32m\]└─\[\e[0m\]\[\e[1;33m\]$(venv_info)\[\e[0m\]\$ '
 
 # ── Completion ────────────────────────────────────────────────────────────────
 [ -r /usr/share/bash-completion/bash_completion ] && \
